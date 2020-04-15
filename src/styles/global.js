@@ -17,7 +17,7 @@ export default createGlobalStyle`
     }
 
     body{
-        background:#ecfbfc;
+        background:#fff;
         -webkit-font-smoothing: antialiased !important;
     }
 
@@ -26,5 +26,6 @@ export default createGlobalStyle`
         font-size: 14px;
         font-family: Roboto, sans-serif;
     }
+
 
 `;

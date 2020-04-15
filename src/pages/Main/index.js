@@ -1,85 +1,104 @@
 import React, { Component } from 'react';
-import { FaSearch, FaSpinner } from 'react-icons/fa';
+import { format, parseISO } from 'date-fns';
+import pt from 'date-fns/locale/pt';
+import { Link } from 'react-router-dom';
 
 import api from '../../services/api';
+import sortJsonArray from 'sort-json-array';
 
-import { Container, Form, SubmitButton, NotaList } from './styles';
+import { FaSearch, FaSpinner } from 'react-icons/fa';
+import { Container, Form, SubmitButton, NotaList, NotaData, NotaServico, Nota } from './styles';
+import {formatPrice} from '../../util/format';
 
 export default class Main extends Component {
     state={
+        cliente_select: 0,
         cliente_atual: 0,
         clientes: [],
         loading: false,
-        notas: []
+        notas: [],
+        notas_selected: []
     };
 
-    componentDidMount(){
-        this.handleGetClientes();
-
-        const clientes = localStorage.getItem('clientes');
-
-        if (clientes){
-            this.setState({ clientes: JSON.parse(clientes) });
-        }
-    }
-
-    componentDidUpdate(_, prevState){
-        const {clientes} = this.state;
-
-        if (prevState.clientes !== clientes){
-            localStorage.setItem('clientes', JSON.stringify(clientes));
-        }
-    }
-
-    handleGetClientes =  async e =>{
-        const response = await api.get(`/cliente`);
+    async componentDidMount(){
+        const response = await api.get(`/cliente/?tipo_serializer=lista`);
 
         const data = {
-            clientes: response.data
+            clientes: sortJsonArray(response.data, 'nome')
         };
-
-        this.setState({
-            clientes: [...data.clientes]
-        })
+        this.setState({clientes: data.clientes})
     }
 
     handleSelectCliente = e => {
-
-        this.setState({ cliente_atual: e.target.value });
-
+        this.setState({ cliente_select: e.target.value });
     }
 
+    handleCheckNota = (nota,index) => {
+        const { notas, notas_selected } = this.state;
+
+        const notaExist = notas.find((n) => n.id === nota.id)
+        if (notaExist.selected === true){
+            const notas = [...this.state.notas];
+            const nota = {...notas[index]};
+            nota.selected = false;
+            notas[index] = nota;
+            this.setState({
+                notas: notas,
+                notas_selected: this.state.notas_selected.filter(function(nota_selected) {
+                    return nota_selected.id !== nota.id
+                })
+            });
+        }else{
+
+            const notas = [...this.state.notas];
+            const nota = {...notas[index]};
+            nota.selected = true;
+            notas[index] = nota;
+            this.setState({
+                notas:notas,
+                notas_selected: [...notas_selected, nota],
+
+            });
+
+        }
+
+    }
 
     handleSubmit = async e =>{
         e.preventDefault();
 
         this.setState({ loading: true });
 
-        const { cliente_atual } = this.state;
+        const { cliente_select } = this.state;
 
-        const [cliente, notas] = await Promise.all([
-            api.get(`/cliente/${cliente_atual}`),
-            api.get(`/nota`)
-        ])
+        const cliente = await api.get(`/cliente/${cliente_select}`);
 
-        this.setState({ notas: [...notas] })
+        const new_notas = cliente.data.nota.map( nota => ({
+            ...nota,
+            selected:false,
+            subtotal: formatPrice(nota.servico.reduce((subtotal, servico) => {
+                return subtotal + servico.chapa['valor'] * servico['quantidade'];
+            },0))
+        }))
 
-        this.setState({ loading: false });
+        this.setState({
+            notas: new_notas,
+            loading: false })
 
-        console.log(cliente);
-        console.log(notas);
     }
 
     render() {
 
-        const { clientes, loading, cliente_atual, notas } = this.state;
+        const { clientes, loading, cliente_select, notas, notas_selected } = this.state;
 
         return (
             <Container>
                 <h1>Listar notas</h1>
+                <Link to={{ pathname: '/print-nota',state: {notas_selected: notas_selected}}}>Imprimir notas selecinadas</Link>
 
                 <Form onSubmit={this.handleSubmit}>
-                    <select name="select" onChange={this.handleSelectCliente} value={cliente_atual}>
+                    <select name="select" onChange={this.handleSelectCliente} value={cliente_select}>
+                        <option key="todos" value="todos">Todos</option>
                         { clientes.map( cliente => (
                             <option key={cliente.id} value={cliente.id}>{cliente.nome}</option>
                         ) ) }
@@ -95,12 +114,38 @@ export default class Main extends Component {
                 </Form>
 
                 <NotaList>
-                            { notas.map( nota => (
-                                <li key={String(nota.id)}>
-                                    nota.numero
-                                </li>
-                            )) }
+                    { notas.map( (nota,index) => (
+                        <Nota onClick={() => this.handleCheckNota(nota,index)} key={String(nota.id)} status={nota.status} selected={nota.selected}>
+                            <NotaData>
+                            <h1>Nota: {nota.numero}</h1>
+                            <span>{
+                            format(
+                                parseISO(nota.created_at),
+                                "'Nota criada em ' dd 'de' MMMM', às' H:mm'h'",
+                                { locale: pt }
+                            )
+                            }</span>
+                            </NotaData>
+                            <NotaServico>
+                                <ul>
+                                    { nota.servico.map( servico => (
+
+                                        <li key={servico.id}>
+                                            <strong>{servico.nome}</strong>
+                                            <p>{servico.quantidade} chapas {servico.chapa.nome}</p>
+
+                                        </li>
+
+                                    ))}
+
+                                </ul>
+                                Valor Total:{ nota.subtotal }
+                            </NotaServico>
+                        </Nota>
+                    )) }
                 </NotaList>
+                <p>Imprimir apenas selecionados</p>
+                <p>Valor total das selecionadas</p>
             </Container>
         );
     }

@@ -1,4 +1,5 @@
 import styled, { keyframes, css } from 'styled-components';
+import { darken } from 'polished';
 
 export const Container = styled.div`
     max-width: 700px;
@@ -23,7 +24,8 @@ export const Form = styled.form`
 
     select {
         flex: 1;
-        height: 30px;
+        height: 40px;
+        font-size: 16px;
     }
 `;
 
@@ -64,5 +66,39 @@ export const SubmitButton = styled.button.attrs((props) => ({
 `;
 
 export const NotaList = styled.ul`
+    padding-top: 30px;
+    margin-top: 30px;
+    border-top: 1px solid #eee;
+    list-style: none;
+`;
+
+export const Nota = styled.li.attrs((props) => ({
+    status: props.status,
+    selected: props.selected,
+}))`
+    display: flex;
+    flex-direction: row;
+    align-items: center;
     margin-top: 10px;
+    justify-content: space-between;
+    padding: 40px 10px;
+    border: 10px solid
+        ${(props) => (props.selected === true ? `#323232` : `#ccc`)};
+    background: ${(props) => (props.status === 0 ? `#fde2e2` : `#b9ebcc`)};
+    border-radius: 4px;
+`;
+
+export const NotaData = styled.div`
+    border-right: 1px solid #eee;
+    padding-right: 30px;
+    margin-right: 10px;
+`;
+
+export const NotaServico = styled.div`
+    display: flex;
+    align-items: start;
+    flex-direction: column;
+    min-width: 300px;
+    padding: 15px 10px;
+    list-style: none;
 `;
