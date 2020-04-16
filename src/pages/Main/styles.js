@@ -89,9 +89,18 @@ export const Nota = styled.li.attrs((props) => ({
 `;
 
 export const NotaData = styled.div`
-    border-right: 1px solid #eee;
     padding-right: 30px;
     margin-right: 10px;
+    width: 290px;
+
+    > h1 {
+        color: #3a3a3a;
+    }
+
+    > span {
+        font-weight: bold;
+        color: #3a3a3a;
+    }
 `;
 
 export const NotaServico = styled.div`
@@ -101,4 +110,30 @@ export const NotaServico = styled.div`
     min-width: 300px;
     padding: 15px 10px;
     list-style: none;
+
+    > ul {
+        list-style: none;
+        > li {
+            padding: 10px 10px 0 10px;
+            & + li {
+                margin-top: 15px;
+                border-top: 1px solid #eee;
+            }
+
+            strong {
+                text-transform: uppercase;
+                font-size: 15px;
+                color: #3a3a3a;
+            }
+
+            p {
+                margin-top: 5px;
+            }
+        }
+    }
+    > strong {
+        color: #3a3a3a;
+        margin-top: 60px;
+        font-size: 16px;
+    }
 `;

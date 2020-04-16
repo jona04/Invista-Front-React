@@ -4,6 +4,8 @@ import pt from 'date-fns/locale/pt';
 
 import { Container, NotaList, NotaData, NotaServico, Nota } from './styles';
 
+import {formatPrice} from '../../util/format';
+
 export default class PrintNota extends Component {
     state = {
         notas_selected: [],
@@ -11,22 +13,23 @@ export default class PrintNota extends Component {
       }
 
     componentDidMount () {
-        const { notas_selected } = this.props.location.state
+        const { notas_selected, cliente } = this.props.location.state
 
         const valor_total = notas_selected.reduce( (valor,nota) => {
-            return valor + nota.subtotal
+            return valor + nota.subtotalf
         },0);
 
         this.setState({
             notas_selected:notas_selected,
-            valor_total:valor_total
+            valor_total:formatPrice(valor_total),
+            cliente:cliente
         })
     }
     render() {
-        const {notas_selected, valor_total}  = this.state;
+        const {notas_selected, valor_total,cliente }  = this.state;
         return (
             <Container>
-                Cliente
+                <h1>{cliente}</h1>
                 <NotaList>
                     { notas_selected.map( (nota,index) => (
                         <Nota key={index}>
@@ -35,7 +38,7 @@ export default class PrintNota extends Component {
                             <span>{
                             format(
                                 parseISO(nota.created_at),
-                                "'Nota criada em ' dd 'de' MMMM', às' H:mm'h'",
+                                "'Emissão em ' dd 'de' MMMM', às' H:mm'h'",
                                 { locale: pt }
                             )
                             }</span>
@@ -53,12 +56,12 @@ export default class PrintNota extends Component {
                                     ))}
 
                                 </ul>
-                                Valor Total:{ nota.subtotal }
+                                <strong>Valor Total:{ nota.subtotal }</strong>
                             </NotaServico>
                         </Nota>
                     )) }
                 </NotaList>
-                                    <p>Valor total: { valor_total}</p>
+                <h1>Valor total: { valor_total}</h1>
             </Container>
         );
     }

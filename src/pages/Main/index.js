@@ -13,7 +13,7 @@ import {formatPrice} from '../../util/format';
 export default class Main extends Component {
     state={
         cliente_select: 0,
-        cliente_atual: 0,
+        cliente_atual: '',
         clientes: [],
         loading: false,
         notas: [],
@@ -76,6 +76,9 @@ export default class Main extends Component {
         const new_notas = cliente.data.nota.map( nota => ({
             ...nota,
             selected:false,
+            subtotalf: nota.servico.reduce((subtotal, servico) => {
+                return subtotal + servico.chapa['valor'] * servico['quantidade'];
+            },0),
             subtotal: formatPrice(nota.servico.reduce((subtotal, servico) => {
                 return subtotal + servico.chapa['valor'] * servico['quantidade'];
             },0))
@@ -83,18 +86,20 @@ export default class Main extends Component {
 
         this.setState({
             notas: new_notas,
-            loading: false })
+            loading: false,
+            cliente_atual: cliente.data.nome
+        })
 
     }
 
     render() {
 
-        const { clientes, loading, cliente_select, notas, notas_selected } = this.state;
+        const { clientes, loading, cliente_atual,cliente_select, notas, notas_selected } = this.state;
 
         return (
             <Container>
                 <h1>Listar notas</h1>
-                <Link to={{ pathname: '/print-nota',state: {notas_selected: notas_selected}}}>Imprimir notas selecinadas</Link>
+                <Link to={{ pathname: '/print-nota',state: {notas_selected: notas_selected, cliente:cliente_atual}}}>Imprimir notas selecinadas</Link>
 
                 <Form onSubmit={this.handleSubmit}>
                     <select name="select" onChange={this.handleSelectCliente} value={cliente_select}>
@@ -121,7 +126,7 @@ export default class Main extends Component {
                             <span>{
                             format(
                                 parseISO(nota.created_at),
-                                "'Nota criada em ' dd 'de' MMMM', às' H:mm'h'",
+                                "'Emissão em ' dd 'de' MMMM', às' H:mm'h'",
                                 { locale: pt }
                             )
                             }</span>
@@ -139,13 +144,11 @@ export default class Main extends Component {
                                     ))}
 
                                 </ul>
-                                Valor Total:{ nota.subtotal }
+                                <strong>Valor Total:{ nota.subtotal }</strong>
                             </NotaServico>
                         </Nota>
                     )) }
                 </NotaList>
-                <p>Imprimir apenas selecionados</p>
-                <p>Valor total das selecionadas</p>
             </Container>
         );
     }
