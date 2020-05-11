@@ -1,13 +1,13 @@
 import React from 'react';
 
+import 'bootswatch/dist/superhero/bootstrap.css';
+
 import Routes from './routes';
-import GlobalStyles from './styles/global';
 
 function App() {
     return (
         <>
             <Routes />
-            <GlobalStyles />
         </>
     );
 }
