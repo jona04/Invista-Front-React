@@ -4,9 +4,12 @@ import 'bootswatch/dist/superhero/bootstrap.css';
 
 import Routes from './routes';
 
+import Navbar from './components/navbar';
+
 function App() {
     return (
         <>
+            <Navbar />
             <Routes />
         </>
     );

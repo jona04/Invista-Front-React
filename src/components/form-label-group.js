@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 function FormLabelGroup(props) {
     return (
@@ -9,3 +10,8 @@ function FormLabelGroup(props) {
     );
 }
 export default FormLabelGroup;
+
+FormLabelGroup.propTypes = {
+    htmlFor: PropTypes.string.isRequired,
+    label: PropTypes.string.isRequired,
+};

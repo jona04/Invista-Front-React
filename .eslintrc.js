@@ -36,8 +36,8 @@ module.exports = {
         'react-native/no-raw-text': 'off',
         'no-param-reassign': 'off',
         'no-underscore-dangle': 'off',
-        camelcase: 'off',
-        'no-console': ['error', { allow: ['tron'] }],
+        'no-console': ['error', { allow: ['warn', 'error', 'tron', 'log'] }],
+        'react/prop-types': [2, { ignore: ['children'] }],
     },
     settings: {
         'import/resolver': {
