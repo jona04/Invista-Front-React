@@ -4,7 +4,7 @@ import NavBarItem from './navbaritem';
 export default function NavBar() {
     return (
         <nav className="navbar navbar-expand-lg navbar-light bg-light">
-            <a className="navbar-brand" href="/">
+            <a className="navbar-brand" href="#/inicio">
                 Invista
             </a>
             <button
@@ -20,10 +20,10 @@ export default function NavBar() {
             </button>
             <div className="collapse navbar-collapse" id="navbarNav">
                 <ul className="navbar-nav">
-                    <NavBarItem label="Inicio" href="/inicio" />
-                    <NavBarItem label="Invista" href="/invista-home" />
-                    <NavBarItem label="The Brindes" href="/the-brindes-home" />
-                    <NavBarItem label="Sair" href="/" />
+                    <NavBarItem label="Inicio" href="#/inicio" />
+                    <NavBarItem label="Invista" href="#/invista-home" />
+                    <NavBarItem label="The Brindes" href="#/the-brindes-home" />
+                    <NavBarItem label="Sair" href="#/sair" />
                 </ul>
             </div>
         </nav>

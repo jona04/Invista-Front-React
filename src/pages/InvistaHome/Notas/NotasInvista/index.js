@@ -3,7 +3,7 @@ import { format, parseISO } from 'date-fns';
 import pt from 'date-fns/locale/pt';
 import { Link } from 'react-router-dom';
 
-import api from '../../services/api';
+import api from '../../../../services/api';
 import sortJsonArray from 'sort-json-array';
 
 import { FaSearch, FaSpinner } from 'react-icons/fa';
@@ -16,14 +16,14 @@ import {
     NotaServico,
     Nota,
 } from './styles';
-import { formatPrice } from '../../util/format';
+import { formatPrice } from '../../../../util/format';
 
 export default class Main extends Component {
     state = {
         cliente_select: 0,
         cliente_atual: '',
         clientes: [],
-        loading: false,
+        loading: 'false',
         notas: [],
         notas_selected: [],
     };
@@ -32,6 +32,8 @@ export default class Main extends Component {
     b = 4;
 
     async componentDidMount() {
+        const token = localStorage.getItem('token');
+        api.defaults.headers.Authorization = `Bearer ${token}`;
         const response = await api.get(`/cliente/?tipo_serializer=lista`);
 
         const data = {
@@ -76,35 +78,39 @@ export default class Main extends Component {
     handleSubmit = async (e) => {
         e.preventDefault();
 
-        this.setState({ loading: true });
+        this.setState({ loading: 'true' });
 
         const { cliente_select } = this.state;
 
-        const cliente = await api.get(`/cliente/${cliente_select}`);
+        try {
+            const cliente = await api.get(`/cliente/${cliente_select}`);
 
-        const new_notas = cliente.data.nota.map((nota) => ({
-            ...nota,
-            selected: false,
-            subtotalf: nota.servico.reduce((subtotal, servico) => {
-                return (
-                    subtotal + servico.chapa['valor'] * servico['quantidade']
-                );
-            }, 0),
-            subtotal: formatPrice(
-                nota.servico.reduce((subtotal, servico) => {
+            const new_notas = cliente.data.nota.map((nota) => ({
+                ...nota,
+                selected: false,
+                subtotalf: nota.servico.reduce((subtotal, servico) => {
                     return (
                         subtotal +
                         servico.chapa['valor'] * servico['quantidade']
                     );
-                }, 0)
-            ),
-        }));
-
-        this.setState({
-            notas: new_notas,
-            loading: false,
-            cliente_atual: cliente.data.nome,
-        });
+                }, 0),
+                subtotal: formatPrice(
+                    nota.servico.reduce((subtotal, servico) => {
+                        return (
+                            subtotal +
+                            servico.chapa['valor'] * servico['quantidade']
+                        );
+                    }, 0)
+                ),
+            }));
+            this.setState({
+                notas: new_notas,
+                loading: 'false',
+                cliente_atual: cliente.data.nome,
+            });
+        } catch (error) {
+            this.setState({ loading: 'false' });
+        }
     };
 
     render() {
@@ -149,7 +155,7 @@ export default class Main extends Component {
                     </select>
 
                     <SubmitButton loading={loading}>
-                        {loading ? (
+                        {loading === 'true' ? (
                             <FaSpinner color="#FFF" size={14} />
                         ) : (
                             <FaSearch color="#fff" size={14} />

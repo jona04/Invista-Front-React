@@ -1,20 +1,28 @@
 import React from 'react';
+import { withRouter } from 'react-router-dom';
+import PropTypes from 'prop-types';
 
-// import logo from '../../assets/logo-thebrindes.png';
+import api from '../../services/api';
 
 import Card from '../../components/card';
 import FormLabelGroup from '../../components/form-label-group';
 
-import './styles.css';
-
-export default class Login extends React.Component {
+class Login extends React.Component {
     state = {
-        usuario: '',
-        senha: '',
+        username: '',
+        password: '',
     };
 
-    entrar = () => {
-        console.log(this.state.usuario, this.state.senha);
+    entrar = async () => {
+        // console.log(this.state.usuario, this.state.senha);
+        try {
+            const resposta = await api.post('/token/', this.state);
+
+            localStorage.setItem('token', resposta.data.access);
+            this.props.history.push('#/inicio');
+        } catch (error) {
+            console.log('Error', JSON.stringify(error));
+        }
     };
 
     render() {
@@ -29,10 +37,10 @@ export default class Login extends React.Component {
                                     htmlFor="usuarioInput"
                                 >
                                     <input
-                                        value={this.state.usuario}
+                                        value={this.state.username}
                                         onChange={(e) =>
                                             this.setState({
-                                                usuario: e.target.value,
+                                                username: e.target.value,
                                             })
                                         }
                                         type="text"
@@ -49,10 +57,10 @@ export default class Login extends React.Component {
                                     htmlFor="inputPassword"
                                 >
                                     <input
-                                        value={this.state.senha}
+                                        value={this.state.password}
                                         onChange={(e) =>
                                             this.setState({
-                                                senha: e.target.value,
+                                                password: e.target.value,
                                             })
                                         }
                                         type="password"
@@ -67,7 +75,7 @@ export default class Login extends React.Component {
                                 className="btn btn-lg btn-primary btn-block text-uppercase"
                                 onClick={this.entrar}
                             >
-                                Sign in
+                                Entrar
                             </button>
                         </Card>
                     </div>
@@ -76,3 +84,9 @@ export default class Login extends React.Component {
         );
     }
 }
+
+export default withRouter(Login);
+
+Login.propTypes = {
+    history: PropTypes.object,
+};

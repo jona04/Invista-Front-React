@@ -1,6 +1,6 @@
 import React from 'react';
 
-import 'bootswatch/dist/superhero/bootstrap.css';
+import 'bootswatch/dist/slate/bootstrap.css';
 
 import Routes from './routes';
 
@@ -10,7 +10,9 @@ function App() {
     return (
         <>
             <Navbar />
-            <Routes />
+            <div className="container">
+                <Routes />
+            </div>
         </>
     );
 }
