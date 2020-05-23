@@ -4,21 +4,22 @@ import pt from 'date-fns/locale/pt';
 
 import { Container, NotaList, NotaData, NotaServico, Nota } from './styles';
 
-import { formatPrice } from '../../util/format';
+import { formatPrice } from '../../../util/format';
 
 export default class PrintNota extends Component {
     state = {
         notas_selected: [],
         valor_total: 0,
+        cliente: '',
     };
 
     componentDidMount() {
-        const { notas_selected, cliente } = this.state;
+        const { notas_selected, cliente } = this.props.location.state;
 
         const valor_total = notas_selected.reduce((valor, nota) => {
             return valor + nota.subtotalf;
         }, 0);
-
+        console.log(valor_total, cliente);
         this.setState({
             notas_selected: notas_selected,
             valor_total: formatPrice(valor_total),

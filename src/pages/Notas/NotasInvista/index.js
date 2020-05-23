@@ -1,9 +1,10 @@
 import React, { Component } from 'react';
 import { format, parseISO } from 'date-fns';
 import pt from 'date-fns/locale/pt';
-import { Link } from 'react-router-dom';
+import PropTypes from 'prop-types';
+import { withRouter } from 'react-router-dom';
 
-import api from '../../../../services/api';
+import ApiService from '../../../services/api';
 import sortJsonArray from 'sort-json-array';
 
 import { FaSearch, FaSpinner } from 'react-icons/fa';
@@ -16,9 +17,9 @@ import {
     NotaServico,
     Nota,
 } from './styles';
-import { formatPrice } from '../../../../util/format';
+import { formatPrice } from '../../../util/format';
 
-export default class Main extends Component {
+class Main extends Component {
     state = {
         cliente_select: 0,
         cliente_atual: '',
@@ -31,15 +32,27 @@ export default class Main extends Component {
     a = parseInt('');
     b = 4;
 
-    async componentDidMount() {
-        const token = localStorage.getItem('token');
-        api.defaults.headers.Authorization = `Bearer ${token}`;
-        const response = await api.get(`/cliente/?tipo_serializer=lista`);
+    constructor() {
+        super();
+        this.service = new ApiService();
+    }
 
-        const data = {
-            clientes: sortJsonArray(response.data, 'nome'),
+    componentDidMount() {
+        const token = localStorage.getItem('token');
+        const config = {
+            headers: { Authorization: `Bearer ${token}` },
         };
-        this.setState({ clientes: data.clientes });
+        this.service
+            .get('/cliente/?tipo_serializer=lista', config)
+            .then((response) => {
+                const data = {
+                    clientes: sortJsonArray(response.data, 'nome'),
+                };
+                this.setState({ clientes: data.clientes });
+            })
+            .catch((error) => {
+                console.log(error);
+            });
     }
 
     handleSelectCliente = (e) => {
@@ -78,57 +91,98 @@ export default class Main extends Component {
     handleSubmit = async (e) => {
         e.preventDefault();
 
+        const token = localStorage.getItem('token');
+        const config = {
+            headers: { Authorization: `Bearer ${token}` },
+        };
+
         this.setState({ loading: 'true' });
 
         const { cliente_select } = this.state;
 
-        try {
-            const cliente = await api.get(`/cliente/${cliente_select}`);
-
-            const new_notas = cliente.data.nota.map((nota) => ({
-                ...nota,
-                selected: false,
-                subtotalf: nota.servico.reduce((subtotal, servico) => {
-                    return (
-                        subtotal +
-                        servico.chapa['valor'] * servico['quantidade']
-                    );
-                }, 0),
-                subtotal: formatPrice(
-                    nota.servico.reduce((subtotal, servico) => {
+        this.service
+            .get(`/cliente/${cliente_select}`, config)
+            .then((response) => {
+                const new_notas = response.data.nota.map((nota) => ({
+                    ...nota,
+                    selected: false,
+                    subtotalf: nota.servico.reduce((subtotal, servico) => {
                         return (
                             subtotal +
                             servico.chapa['valor'] * servico['quantidade']
                         );
-                    }, 0)
-                ),
-            }));
-            this.setState({
-                notas: new_notas,
-                loading: 'false',
-                cliente_atual: cliente.data.nome,
+                    }, 0),
+                    subtotal: formatPrice(
+                        nota.servico.reduce((subtotal, servico) => {
+                            return (
+                                subtotal +
+                                servico.chapa['valor'] * servico['quantidade']
+                            );
+                        }, 0)
+                    ),
+                }));
+                this.setState({
+                    notas: new_notas,
+                    loading: 'false',
+                    cliente_atual: response.data.nome,
+                });
+            })
+            .catch(() => {
+                this.setState({ loading: 'false' });
             });
-        } catch (error) {
-            this.setState({ loading: 'false' });
-        }
+
+        // const cliente = await api.get(`/cliente/${cliente_select}`);
+
+        // const new_notas = cliente.data.nota.map((nota) => ({
+        //     ...nota,
+        //     selected: false,
+        //     subtotalf: nota.servico.reduce((subtotal, servico) => {
+        //         return (
+        //             subtotal +
+        //             servico.chapa['valor'] * servico['quantidade']
+        //         );
+        //     }, 0),
+        //     subtotal: formatPrice(
+        //         nota.servico.reduce((subtotal, servico) => {
+        //             return (
+        //                 subtotal +
+        //                 servico.chapa['valor'] * servico['quantidade']
+        //             );
+        //         }, 0)
+        //     ),
+        // }));
+        // this.setState({
+        //     notas: new_notas,
+        //     loading: 'false',
+        //     cliente_atual: cliente.data.nome,
+        // });
+        // } catch (error) {
+        //     this.setState({ loading: 'false' });
+        // }
+    };
+
+    printNotas = () => {
+        this.props.history.push({
+            pathname: '/print-nota',
+            state: {
+                notas_selected: this.state.notas_selected,
+                cliente: this.state.cliente_atual,
+            },
+        });
     };
 
     render() {
-        const {
-            clientes,
-            loading,
-            cliente_atual,
-            cliente_select,
-            notas,
-            notas_selected,
-        } = this.state;
+        const { clientes, loading, cliente_select, notas } = this.state;
 
         return (
             <Container>
                 <h1>Listar notas</h1>
-                <Link
+                <button onClick={this.printNotas}>
+                    Imprimir notas selecinadas
+                </button>
+                {/* <Link
                     to={{
-                        pathname: '/print-nota',
+                        pathname: '#/print-nota',
                         state: {
                             notas_selected: notas_selected,
                             cliente: cliente_atual,
@@ -136,7 +190,7 @@ export default class Main extends Component {
                     }}
                 >
                     Imprimir notas selecinadas
-                </Link>
+                </Link> */}
 
                 <Form onSubmit={this.handleSubmit}>
                     <select
@@ -202,3 +256,9 @@ export default class Main extends Component {
         );
     }
 }
+
+export default withRouter(Main);
+
+Main.propTypes = {
+    history: PropTypes.object,
+};

@@ -2,7 +2,7 @@ import React from 'react';
 import { withRouter } from 'react-router-dom';
 import PropTypes from 'prop-types';
 
-import api from '../../services/api';
+import ApiService from '../../services/api';
 
 import Card from '../../components/card';
 import FormLabelGroup from '../../components/form-label-group';
@@ -11,18 +11,29 @@ class Login extends React.Component {
     state = {
         username: '',
         password: '',
+        mensagemErro: null,
     };
 
-    entrar = async () => {
-        // console.log(this.state.usuario, this.state.senha);
-        try {
-            const resposta = await api.post('/token/', this.state);
+    constructor() {
+        super();
+        this.service = new ApiService();
+    }
 
-            localStorage.setItem('token', resposta.data.access);
-            this.props.history.push('#/inicio');
-        } catch (error) {
-            console.log('Error', JSON.stringify(error));
-        }
+    entrar = () => {
+        // console.log(this.state.usuario, this.state.senha);
+
+        this.service
+            .post('/api/token/', {
+                username: this.state.username,
+                password: this.state.password,
+            })
+            .then((response) => {
+                localStorage.setItem('token', response.data.access);
+                this.props.history.push('#/inicio');
+            })
+            .catch((error) => {
+                this.setState({ mensagemErro: error.message });
+            });
     };
 
     render() {
@@ -31,6 +42,11 @@ class Login extends React.Component {
                 <div className="row">
                     <div className="col-sm-9 col-md-7 col-lg-5 mx-auto">
                         <Card title="Login">
+                            <div className="row">
+                                <p className="text-danger">
+                                    {this.state.mensagemErro}
+                                </p>
+                            </div>
                             <form className="form-signin">
                                 <FormLabelGroup
                                     label="Usuario"
@@ -45,6 +61,7 @@ class Login extends React.Component {
                                         }
                                         type="text"
                                         id="inputusuario"
+                                        autoComplete="off"
                                         className="form-control"
                                         placeholder="Usuario"
                                         required
@@ -67,6 +84,7 @@ class Login extends React.Component {
                                         id="inputPassword"
                                         className="form-control"
                                         placeholder="Password"
+                                        autoComplete="off"
                                         required
                                     />
                                 </FormLabelGroup>

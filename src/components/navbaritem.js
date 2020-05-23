@@ -2,13 +2,17 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 export default function NavBarItem(props) {
-    return (
-        <li className="nav-item">
-            <a className="nav-link" href={props.href}>
-                {props.label}
-            </a>
-        </li>
-    );
+    if (props.render) {
+        return (
+            <li className="nav-item">
+                <a className="nav-link" href={props.href}>
+                    {props.label}
+                </a>
+            </li>
+        );
+    } else {
+        return <div />;
+    }
 }
 
 NavBarItem.propTypes = {

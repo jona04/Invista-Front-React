@@ -10,7 +10,7 @@ function App() {
     return (
         <>
             <Navbar />
-            <div className="container">
+            <div className="container-fluid">
                 <Routes />
             </div>
         </>

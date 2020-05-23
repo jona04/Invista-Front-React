@@ -1,7 +1,13 @@
 import React from 'react';
 import NavBarItem from './navbaritem';
+import ApiService from '../services/api';
 
 export default function NavBar() {
+    const isAutenticado = () => {
+        console.log(ApiService.isAutenticado);
+        return ApiService.isAutenticado;
+    };
+
     return (
         <nav className="navbar navbar-expand-lg navbar-light bg-light">
             <a className="navbar-brand" href="#/inicio">
@@ -20,10 +26,26 @@ export default function NavBar() {
             </button>
             <div className="collapse navbar-collapse" id="navbarNav">
                 <ul className="navbar-nav">
-                    <NavBarItem label="Inicio" href="#/inicio" />
-                    <NavBarItem label="Invista" href="#/invista-home" />
-                    <NavBarItem label="The Brindes" href="#/the-brindes-home" />
-                    <NavBarItem label="Sair" href="#/sair" />
+                    <NavBarItem
+                        render={isAutenticado()}
+                        label="Inicio"
+                        href="#/inicio"
+                    />
+                    <NavBarItem
+                        render={isAutenticado()}
+                        label="Entradas"
+                        href="#/entradas"
+                    />
+                    <NavBarItem
+                        render={isAutenticado()}
+                        label="Saídas"
+                        href="#/saidas"
+                    />
+                    <NavBarItem
+                        render={isAutenticado()}
+                        label="Sair"
+                        href="#/sair"
+                    />
                 </ul>
             </div>
         </nav>
