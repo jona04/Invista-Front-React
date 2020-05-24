@@ -1,5 +1,5 @@
 import React from 'react';
-import 'bootswatch/dist/slate/bootstrap.css';
+// import 'bootswatch/dist/slate/bootstrap.css';
 
 // import ProvedorAutenticacao from './provedorAutenticacao';
 
