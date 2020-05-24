@@ -2,7 +2,7 @@ import React from 'react';
 import ListGroup from '../../../components/list-group';
 import ListGroupItem from '../../../components/list-group-item';
 import api from '../../../services/api';
-// import sortJsonArray from 'sort-json-array';
+import { formatPrice } from '../../../util/format';
 
 export default class SaidasListar extends React.Component {
     state = {
@@ -15,10 +15,13 @@ export default class SaidasListar extends React.Component {
         api.defaults.headers.Authorization = `Bearer ${token}`;
         api.get('/api/saidas/')
             .then((response) => {
-                // const data = {
-                //     clientes: sortJsonArray(response.data, 'nome'),
-                // };
-                this.setState({ lista_saidas: response.data });
+                const new_lista = response.data.map((saida) => ({
+                    id: saida.id,
+                    descricao: saida.descricao,
+                    valor: formatPrice(saida.valor),
+                    origem: saida.origem,
+                }));
+                this.setState({ lista_saidas: new_lista });
             })
             .catch((error) => {
                 console.log(error);
@@ -53,7 +56,11 @@ export default class SaidasListar extends React.Component {
                                     key={saida}
                                     value={saida.descricao.toString()}
                                 >
-                                    {saida.descricao.toString()}
+                                    {saida.descricao.toString()} |
+                                    {saida.valor.toString()} |
+                                    {saida.origem === 0
+                                        ? 'INVISTA'
+                                        : 'THE BRINDES'}
                                 </li>
                             ))}
                         </ul>
