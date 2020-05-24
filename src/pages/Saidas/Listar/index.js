@@ -50,7 +50,7 @@ export default class SaidasListar extends React.Component {
                         <ul>
                             {lista_saidas.map((saida) => (
                                 <li
-                                    key={saida.descricao.id}
+                                    key={saida}
                                     value={saida.descricao.toString()}
                                 >
                                     {saida.descricao.toString()}
