@@ -2,7 +2,8 @@ import React from 'react';
 import { withRouter } from 'react-router-dom';
 import PropTypes from 'prop-types';
 
-import ApiService from '../../services/api';
+import api from '../../services/api';
+import { AuthContext } from '../../provedorAutenticacao';
 
 import Card from '../../components/card';
 import FormLabelGroup from '../../components/form-label-group';
@@ -14,21 +15,17 @@ class Login extends React.Component {
         mensagemErro: null,
     };
 
-    constructor() {
-        super();
-        this.service = new ApiService();
-    }
-
     entrar = () => {
         // console.log(this.state.usuario, this.state.senha);
 
-        this.service
-            .post('/api/token/', {
-                username: this.state.username,
-                password: this.state.password,
-            })
+        api.post('/api/token/', {
+            username: this.state.username,
+            password: this.state.password,
+        })
             .then((response) => {
                 localStorage.setItem('token', response.data.access);
+                localStorage.setItem('usuario', this.state.username);
+
                 this.props.history.push('#/inicio');
             })
             .catch((error) => {
@@ -102,6 +99,8 @@ class Login extends React.Component {
         );
     }
 }
+
+Login.contextType = AuthContext;
 
 export default withRouter(Login);
 

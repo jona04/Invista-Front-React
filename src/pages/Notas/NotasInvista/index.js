@@ -4,7 +4,7 @@ import pt from 'date-fns/locale/pt';
 import PropTypes from 'prop-types';
 import { withRouter } from 'react-router-dom';
 
-import ApiService from '../../../services/api';
+import api from '../../../services/api';
 import sortJsonArray from 'sort-json-array';
 
 import { FaSearch, FaSpinner } from 'react-icons/fa';
@@ -32,18 +32,11 @@ class Main extends Component {
     a = parseInt('');
     b = 4;
 
-    constructor() {
-        super();
-        this.service = new ApiService();
-    }
-
     componentDidMount() {
         const token = localStorage.getItem('token');
-        const config = {
-            headers: { Authorization: `Bearer ${token}` },
-        };
-        this.service
-            .get('/cliente/?tipo_serializer=lista', config)
+
+        api.defaults.headers.Authorization = `Bearer ${token}`;
+        api.get('/cliente/?tipo_serializer=lista')
             .then((response) => {
                 const data = {
                     clientes: sortJsonArray(response.data, 'nome'),

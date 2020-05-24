@@ -1,12 +1,13 @@
 import React from 'react';
 import NavBarItem from './navbaritem';
-import ApiService from '../services/api';
+// import { AuthContext } from '../provedorAutenticacao';
 
 export default function NavBar() {
-    const isAutenticado = () => {
-        console.log(ApiService.isAutenticado);
-        return ApiService.isAutenticado;
-    };
+    // const isAutenticado = () => {
+    //     const token = localStorage.getItem("token");
+    //     if
+    //     return ApiService.isAutenticado;
+    // };
 
     return (
         <nav className="navbar navbar-expand-lg navbar-light bg-light">
@@ -26,26 +27,14 @@ export default function NavBar() {
             </button>
             <div className="collapse navbar-collapse" id="navbarNav">
                 <ul className="navbar-nav">
+                    <NavBarItem render={true} label="Inicio" href="#/inicio" />
                     <NavBarItem
-                        render={isAutenticado()}
-                        label="Inicio"
-                        href="#/inicio"
-                    />
-                    <NavBarItem
-                        render={isAutenticado()}
+                        render={true}
                         label="Entradas"
                         href="#/entradas"
                     />
-                    <NavBarItem
-                        render={isAutenticado()}
-                        label="Saídas"
-                        href="#/saidas"
-                    />
-                    <NavBarItem
-                        render={isAutenticado()}
-                        label="Sair"
-                        href="#/sair"
-                    />
+                    <NavBarItem render={true} label="Saídas" href="#/saidas" />
+                    <NavBarItem render={true} label="Sair" href="#/sair" />
                 </ul>
             </div>
         </nav>

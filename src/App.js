@@ -1,6 +1,7 @@
 import React from 'react';
-
 import 'bootswatch/dist/slate/bootstrap.css';
+
+// import ProvedorAutenticacao from './provedorAutenticacao';
 
 import Routes from './routes';
 

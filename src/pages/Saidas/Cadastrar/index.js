@@ -4,7 +4,8 @@ import PropTypes from 'prop-types';
 
 import ListGroup from '../../../components/list-group';
 import ListGroupItem from '../../../components/list-group-item';
-import ApiService from '../../../services/api';
+import api from '../../../services/api';
+import { AuthContext } from '../../../provedorAutenticacao';
 
 class SaidasCadastrar extends React.Component {
     state = {
@@ -15,29 +16,18 @@ class SaidasCadastrar extends React.Component {
         mensagemErro: null,
     };
 
-    constructor() {
-        super();
-        this.service = new ApiService();
-    }
-
     cadastrar = () => {
         const token = localStorage.getItem('token');
-        const config = {
-            headers: { Authorization: `Bearer ${token}` },
-        };
-        this.service
-            .post(
-                '/api/saidas/',
-                {
-                    descricao: this.state.descricao,
-                    valor: this.state.valor,
-                    origem: this.state.origem,
-                },
-                config
-            )
+
+        api.defaults.headers.Authorization = `Bearer ${token}`;
+        api.post('/api/saidas/', {
+            descricao: this.state.descricao,
+            valor: this.state.valor,
+            origem: this.state.origem,
+        })
             .then((response) => {
                 console.log(JSON.stringify(response));
-                this.props.history.push('#/saidas/listar');
+                this.props.history.push('/saidas/listar');
             })
             .catch((error) => {
                 this.setState({ mensagemErro: error.message });
@@ -69,7 +59,7 @@ class SaidasCadastrar extends React.Component {
                     </div>
                     <div className="col-9">
                         <form>
-                            <div className="form-group">
+                            {/* <div className="form-group">
                                 <label htmlFor="exampleFormControlFile1">
                                     Enviar foto
                                 </label>
@@ -78,7 +68,7 @@ class SaidasCadastrar extends React.Component {
                                     className="form-control-file"
                                     id="exampleFormControlFile1"
                                 />
-                            </div>
+                            </div> */}
                             <div className="form-group">
                                 <label htmlFor="descricao">Descrição</label>
                                 <input
@@ -140,6 +130,8 @@ class SaidasCadastrar extends React.Component {
         );
     }
 }
+
+SaidasCadastrar.contextType = AuthContext;
 
 export default withRouter(SaidasCadastrar);
 
