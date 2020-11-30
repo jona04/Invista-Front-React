@@ -18,7 +18,7 @@ class Login extends React.Component {
     entrar = () => {
         // console.log(this.state.usuario, this.state.senha);
 
-        api.post('/api/token/', {
+        api.post('/token/', {
             username: this.state.username,
             password: this.state.password,
         })
